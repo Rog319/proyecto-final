@@ -26,9 +26,10 @@ class HomePage extends StatelessWidget {
         itemCount: spotifyServices.propiedadesCanciones.length,
         itemBuilder: (context, i) {
           return ListTile(
-            subtitle: Text(
-                'Artista: ' + spotifyServices.propiedadesCanciones[i].name),
-            title: const Text('Cancion: DAKITI'),
+            subtitle: Text('Artista/s: ' +
+                spotifyServices.propiedadesCanciones[0].artistas),
+            title: Text('Nombre de la canción: ' +
+                spotifyServices.propiedadesCanciones[0].name),
           );
         },
       ),

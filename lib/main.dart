@@ -15,6 +15,7 @@ class AppState extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (_) => SpotifyServices(),
+          //lazy: false,
         )
       ],
       child: const MyApp(),
