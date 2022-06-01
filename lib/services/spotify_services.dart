@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:proyecto_final/models/spotify_model.dart';
 
@@ -7,59 +8,115 @@ class SpotifyServices extends ChangeNotifier {
   final String _urlBase = 'spotify23.p.rapidapi.com';
   final String _apiKey = '9a9eaa7854msh1d9684f5ed5c98bp195618jsna0515f52f93c';
 
-  List<Canciones> propiedadesCanciones = [];
+  List<Canciones> cancionesBuscadas = [];
+  List<Canciones> cancionesRegresadas = [];
+  List<Canciones> cancionesFavoritas = [];
+  late Canciones cancionActual;
   Map infoCanciones = {};
+  String track = '';
+  bool liked = false;
+  late int miliseconds;
+  String timeFormat = '';
+  int indexBar = 0;
+  String nombresCombinados = '';
 
-  SpotifyServices() {
-    getService();
+  changeIndexBar(int valor) {
+    indexBar = valor;
+    notifyListeners();
   }
+
+  changeTrack(String valor) {
+    track = valor;
+    notifyListeners();
+    //print(track);
+  }
+
+  isfavorite(Canciones cancion) {
+    if (cancion.favorito) {
+      cancion.favorito = false;
+      cancionesFavoritas.removeWhere(((element) => element.id == cancion.id));
+    } else {
+      cancion.favorito = true;
+      cancionesFavoritas.add(cancion);
+    }
+    for (int i = 0; i < cancionesFavoritas.length; i++) {
+      print(cancionesFavoritas[i].name);
+    }
+
+    notifyListeners();
+  }
+
+  clearCancionesRegresados() {
+    cancionesRegresadas = [];
+    notifyListeners();
+  }
+
+  SpotifyServices();
 
   getService() async {
     final url = Uri.https(_urlBase, '/search/', {
-      'q': 'dakiti',
+      'q': track,
       'type': 'tracks',
       'offset': '0',
-      'limit': '1',
+      'limit': '5',
       'numberOfTopResults': '1'
     });
+    //print(track);
 
     final respuesta = await http.get(url,
         headers: {'X-RapidAPI-Host': _urlBase, 'X-RapidAPI-Key': _apiKey});
 
     Map jCompleto = jsonDecode(respuesta.body);
-    Map jTracks = jCompleto['tracks'];
-    List jItems = jTracks['items'];
-
-    //Contiene la parte mas importante de informacion del Json
-    Map jData = jItems[0]['data'];
-
-    //Contendra la informacion del album de la cancion
-    Map jAlbumInfo = jData['albumOfTrack'];
-
-    //Sacamos la informacion de los artistas del json
-    Map jArtistsInfo = jData['artists'];
-
-    //Guardamos toda la informacion de cada artista en una lista
-    List artists = jArtistsInfo['items'];
-
-    //En un mapa guardamos el perfil que es donde esta la propiedad name
-    Map profileArtists = {};
+    //Creamos la lista que contendra la informacion de las canciones y la guardamos
+    List jItems = jCompleto['tracks']['items'];
 
     //Creamos una lista de nombres
-    List nameArtists = [];
+    List artistsItems = jItems[0]['data']['artists']['items'];
+    List artistsNames = [];
 
-    //Ciclo para sacar los artistas de la cancion y guardarlos en una lista
-    for (var i = 0; i < artists.length; i++) {
-      profileArtists = artists[i]['profile'];
-      nameArtists.add(profileArtists['name']);
+    artistsItems.forEach((e) {
+      artistsNames.add(e['profile']['name']);
+    });
+    String names = artistsNames.join(", ");
+
+    //Regresa la duracion de la cancion
+
+    miliseconds = jItems[0]['data']['duration']['totalMilliseconds'];
+
+    Duration duration = Duration(milliseconds: miliseconds);
+    int minutes = duration.inMinutes;
+    int seconds = duration.inSeconds.remainder(60);
+
+    timeFormat = "$minutes:$seconds";
+
+    cancionesRegresadas = [];
+    //Metodo para guardar la informarcion de las canciones
+    jItems.forEach((e) {
+      Canciones canciones = Canciones(
+          id: e['data']['id'],
+          name: e['data']['name'],
+          albumName: e['data']['albumOfTrack']['name'],
+          artistas: '', //names,
+          duration: timeFormat,
+          urlImage: e['data']['albumOfTrack']['coverArt']['sources'][1]['url']);
+
+      cancionesRegresadas.add(canciones);
+    });
+
+    for (int i = 0; i < cancionesRegresadas.length; i++) {
+      List nombres = jItems[i]['data']['artists']['items'];
+      List<String> aux = [];
+      nombres.forEach((nombre) {
+        aux.add(nombre['profile']['name']);
+      });
+      nombresCombinados = aux.join(", ");
+      cancionesRegresadas[i].artistas = nombresCombinados;
     }
-
-    var artistas = nameArtists.join(", ");
-
-    print(artistas);
+    notifyListeners();
+    //print(cancionActual.name);
 
     //Creamos nuestro mapa perzonalizado con los datos que nos intersan
-    infoCanciones = {
+    /*infoCanciones = {
       'id': jData['id'],
       'name': jData['name'],
       'albumName': jAlbumInfo['name'],
@@ -71,20 +128,19 @@ class SpotifyServices extends ChangeNotifier {
         name: infoCanciones['name'],
         albumName: infoCanciones['albumName'],
         artistas: infoCanciones['artistas']);
-
+    
     propiedadesCanciones.add(canciones);
     notifyListeners();
     //print(infoCanciones['name']);
+    */
+  }
 
-    /*
-    Map album = tracks['tracks'][0];
-    Map albumInfo = album['album'];
-    List artists = albumInfo['artists'];
-
-    for (var i = 0; i < artists.length; i++) {
-      Canciones2 canciones2 =
-          Canciones2(id: artists[i]['id'], name: artists[i]['name']);
-      propiedadesCanciones.add(canciones2);
-    }*/
+  bool contieneDuplicados(String valor) {
+    for (int i = 0; i < cancionesBuscadas.length; i++) {
+      if (cancionesBuscadas[i].id == valor) {
+        return true;
+      }
+    }
+    return false;
   }
 }
