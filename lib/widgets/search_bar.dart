@@ -21,10 +21,10 @@ class _SearchBarState extends State<SearchBar> {
       children: [
         AnimatedContainer(
           duration: const Duration(microseconds: 400),
-          width: _folded ? 56 : 200,
+          width: 200,
           height: 56,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
+            borderRadius: BorderRadius.circular(30),
             color: Colors.white,
             boxShadow: kElevationToShadow[6],
           ),
@@ -33,55 +33,59 @@ class _SearchBarState extends State<SearchBar> {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.only(left: 16),
-                  child: !_folded
-                      ? TextField(
-                          decoration: InputDecoration(
-                              hintText: 'Buscar',
-                              hintStyle: TextStyle(color: Colors.blue[300]),
-                              border: InputBorder.none),
-                          controller: controller,
-                        )
-                      : null,
+                  child: TextField(
+                    decoration: const InputDecoration(
+                        hintText: 'Buscar',
+                        hintStyle: TextStyle(color: Colors.deepPurple),
+                        border: InputBorder.none),
+                    controller: controller,
+                  ),
                 ),
               ),
               AnimatedContainer(
-                duration: const Duration(microseconds: 400),
-                child: Material(
-                  type: MaterialType.transparency,
-                  child: InkWell(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(_folded ? 32 : 0),
-                        topRight: const Radius.circular(32),
-                        bottomLeft: Radius.circular(_folded ? 32 : 0),
-                        bottomRight: const Radius.circular(32)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Icon(
-                        _folded ? Icons.search : Icons.close,
-                        color: Colors.blue[900],
+                  duration: const Duration(microseconds: 400),
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: InkWell(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(_folded ? 32 : 0),
+                          topRight: const Radius.circular(32),
+                          bottomLeft: Radius.circular(_folded ? 32 : 0),
+                          bottomRight: const Radius.circular(32)),
+                      child: const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.deepPurple,
+                        ),
                       ),
+                      onTap: () {
+                        setState(() {
+                          _folded = !_folded;
+                        });
+                        controller.clear();
+                        spotifyServices.clearCancionesRegresados();
+                      },
                     ),
-                    onTap: () {
-                      setState(() {
-                        _folded = !_folded;
-                      });
-                      controller.clear();
-                      spotifyServices.clearCancionesRegresados();
-                    },
-                  ),
-                ),
-              )
+                  ))
             ],
           ),
         ),
-        ElevatedButton(
-          child: const Text('Buscar'),
-          onPressed: () {
-            if (controller.text != '') {
-              spotifyServices.changeTrack(controller.text);
-              spotifyServices.getService();
-            }
-          },
+        SizedBox(
+          child: ElevatedButton(
+            child: const Text('Buscar'),
+            onPressed: () {
+              if (controller.text != '') {
+                spotifyServices.changeTrack(controller.text);
+                spotifyServices.getService();
+              }
+            },
+            style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+            ))),
+          ),
         ),
       ],
     );

@@ -93,12 +93,13 @@ class SpotifyServices extends ChangeNotifier {
     //Metodo para guardar la informarcion de las canciones
     jItems.forEach((e) {
       Canciones canciones = Canciones(
-          id: e['data']['id'],
-          name: e['data']['name'],
-          albumName: e['data']['albumOfTrack']['name'],
-          artistas: '', //names,
-          duration: timeFormat,
-          urlImage: e['data']['albumOfTrack']['coverArt']['sources'][1]['url']);
+        id: e['data']['id'],
+        name: e['data']['name'],
+        albumName: e['data']['albumOfTrack']['name'],
+        artistas: '', //names,
+        duration: timeFormat,
+        urlImage: e['data']['albumOfTrack']['coverArt']['sources'][1]['url'],
+      );
 
       cancionesRegresadas.add(canciones);
     });
@@ -114,25 +115,6 @@ class SpotifyServices extends ChangeNotifier {
     }
     notifyListeners();
     //print(cancionActual.name);
-
-    //Creamos nuestro mapa perzonalizado con los datos que nos intersan
-    /*infoCanciones = {
-      'id': jData['id'],
-      'name': jData['name'],
-      'albumName': jAlbumInfo['name'],
-      'artistas': artistas
-    };
-
-    Canciones canciones = Canciones(
-        id: infoCanciones['id'],
-        name: infoCanciones['name'],
-        albumName: infoCanciones['albumName'],
-        artistas: infoCanciones['artistas']);
-    
-    propiedadesCanciones.add(canciones);
-    notifyListeners();
-    //print(infoCanciones['name']);
-    */
   }
 
   bool contieneDuplicados(String valor) {

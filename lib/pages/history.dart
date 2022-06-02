@@ -11,7 +11,21 @@ class History extends StatelessWidget {
   Widget build(BuildContext context) {
     final spotifyServices = Provider.of<SpotifyServices>(context);
     if (spotifyServices.cancionesBuscadas.isEmpty) {
-      return const Text('Aun no hay historial');
+      return Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Text(
+            'Aun no hay historial',
+            style: TextStyle(fontSize: 30),
+          ),
+          Icon(
+            Icons.history,
+            color: Colors.deepPurple,
+            size: 80,
+          )
+        ],
+      ));
     } else {
       return ListView.builder(
           itemCount: spotifyServices.cancionesBuscadas.length,

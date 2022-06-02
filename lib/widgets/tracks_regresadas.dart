@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_final/models/spotify_model.dart';
+import 'package:proyecto_final/pages/track_info.dart';
 
 import '../services/spotify_services.dart';
 
@@ -17,6 +18,10 @@ class TracksRegresadas extends StatelessWidget {
         if (spotifyServices.contieneDuplicados(cancion.id) == false) {
           spotifyServices.cancionesBuscadas.add(cancion);
         }
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const TrackInfo()),
+        );
       },
       child: Padding(
         padding: const EdgeInsets.only(top: 20),

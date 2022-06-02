@@ -11,7 +11,21 @@ class TracksSaved extends StatelessWidget {
   Widget build(BuildContext context) {
     final spotifyServices = Provider.of<SpotifyServices>(context);
     if (spotifyServices.cancionesFavoritas.isEmpty) {
-      return const Text('No has agregado ninguna a favoritos');
+      return Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Text(
+            'No tienes canciones favoritas',
+            style: TextStyle(fontSize: 28),
+          ),
+          Icon(
+            Icons.library_music,
+            color: Colors.deepPurple,
+            size: 80,
+          )
+        ],
+      ));
     } else {
       return ListView.builder(
           itemCount: spotifyServices.cancionesFavoritas.length,

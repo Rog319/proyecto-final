@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_final/models/spotify_model.dart';
 
+import '../pages/track_info.dart';
 import '../services/spotify_services.dart';
 
 // ignore: must_be_immutable
@@ -13,7 +14,16 @@ class TracksHistory extends StatelessWidget {
   Widget build(BuildContext context) {
     final spotifyServices = Provider.of<SpotifyServices>(context);
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        spotifyServices.cancionActual = cancion;
+        if (spotifyServices.contieneDuplicados(cancion.id) == false) {
+          spotifyServices.cancionesBuscadas.add(cancion);
+        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const TrackInfo()),
+        );
+      },
       child: Padding(
         padding: const EdgeInsets.only(top: 20),
         child: Column(
