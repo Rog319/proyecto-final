@@ -60,9 +60,6 @@ class _SearchBarState extends State<SearchBar> {
                         ),
                       ),
                       onTap: () {
-                        setState(() {
-                          _folded = !_folded;
-                        });
                         controller.clear();
                         spotifyServices.clearCancionesRegresados();
                       },

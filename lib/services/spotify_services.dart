@@ -28,7 +28,6 @@ class SpotifyServices extends ChangeNotifier {
   changeTrack(String valor) {
     track = valor;
     notifyListeners();
-    //print(track);
   }
 
   isfavorite(Canciones cancion) {
@@ -39,10 +38,6 @@ class SpotifyServices extends ChangeNotifier {
       cancion.favorito = true;
       cancionesFavoritas.add(cancion);
     }
-    for (int i = 0; i < cancionesFavoritas.length; i++) {
-      print(cancionesFavoritas[i].name);
-    }
-
     notifyListeners();
   }
 
@@ -61,7 +56,6 @@ class SpotifyServices extends ChangeNotifier {
       'limit': '5',
       'numberOfTopResults': '1'
     });
-    //print(track);
 
     final respuesta = await http.get(url,
         headers: {'X-RapidAPI-Host': _urlBase, 'X-RapidAPI-Key': _apiKey});
@@ -69,25 +63,6 @@ class SpotifyServices extends ChangeNotifier {
     Map jCompleto = jsonDecode(respuesta.body);
     //Creamos la lista que contendra la informacion de las canciones y la guardamos
     List jItems = jCompleto['tracks']['items'];
-
-    //Creamos una lista de nombres
-    List artistsItems = jItems[0]['data']['artists']['items'];
-    List artistsNames = [];
-
-    artistsItems.forEach((e) {
-      artistsNames.add(e['profile']['name']);
-    });
-    String names = artistsNames.join(", ");
-
-    //Regresa la duracion de la cancion
-
-    miliseconds = jItems[0]['data']['duration']['totalMilliseconds'];
-
-    Duration duration = Duration(milliseconds: miliseconds);
-    int minutes = duration.inMinutes;
-    int seconds = duration.inSeconds.remainder(60);
-
-    timeFormat = "$minutes:$seconds";
 
     cancionesRegresadas = [];
     //Metodo para guardar la informarcion de las canciones
@@ -100,9 +75,10 @@ class SpotifyServices extends ChangeNotifier {
         duration: timeFormat,
         urlImage: e['data']['albumOfTrack']['coverArt']['sources'][1]['url'],
       );
-
       cancionesRegresadas.add(canciones);
     });
+
+    //Metodo para sobreescribir valores de duracion y artistas
 
     for (int i = 0; i < cancionesRegresadas.length; i++) {
       List nombres = jItems[i]['data']['artists']['items'];
@@ -111,12 +87,22 @@ class SpotifyServices extends ChangeNotifier {
         aux.add(nombre['profile']['name']);
       });
       nombresCombinados = aux.join(", ");
+
+      miliseconds = jItems[i]['data']['duration']['totalMilliseconds'];
+
+      Duration duration = Duration(milliseconds: miliseconds);
+      int minutes = duration.inMinutes;
+      String seconds = dosValores(duration.inSeconds.remainder(60));
+
+      timeFormat = "$minutes:$seconds";
       cancionesRegresadas[i].artistas = nombresCombinados;
+      cancionesRegresadas[i].duration = timeFormat;
     }
+
     notifyListeners();
-    //print(cancionActual.name);
   }
 
+  //Comprueba si hay duplicados devolviendo true o false
   bool contieneDuplicados(String valor) {
     for (int i = 0; i < cancionesBuscadas.length; i++) {
       if (cancionesBuscadas[i].id == valor) {
@@ -124,5 +110,10 @@ class SpotifyServices extends ChangeNotifier {
       }
     }
     return false;
+  }
+
+  //Formatea la duracion de la cancion
+  String dosValores(int valor) {
+    return valor >= 10 ? "$valor" : "0$valor";
   }
 }

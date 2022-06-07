@@ -5,7 +5,6 @@ class Canciones {
   String artistas;
   String urlImage;
   String duration;
-
   bool favorito = false;
 
   Canciones({
